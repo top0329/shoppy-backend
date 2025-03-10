@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProductRequest } from './dto/create-product.request';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ProductsService {
@@ -13,5 +13,9 @@ export class ProductsService {
         userId,
       },
     });
+  }
+
+  async getProducts() {
+    return this.prismaService.product.findMany();
   }
 }
