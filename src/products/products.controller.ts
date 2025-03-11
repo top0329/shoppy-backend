@@ -4,6 +4,7 @@ import {
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Post,
   UploadedFile,
@@ -18,6 +19,7 @@ import { CreateProductRequest } from './dto/create-product.request';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { TokenPayload } from '../auth/token-payload.interface';
 import { ProductsService } from './products.service';
+import { PRODUCT_IMAGES } from './product-images';
 
 @Controller('products')
 export class ProductsController {
@@ -37,7 +39,7 @@ export class ProductsController {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: 'public/products',
+        destination: PRODUCT_IMAGES,
         filename: (req, file, callback) => {
           callback(
             null,
@@ -63,5 +65,11 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard)
   async getProducts() {
     return this.productsService.getProducts();
+  }
+
+  @Get(':productId')
+  @UseGuards(JwtAuthGuard)
+  async getProduct(@Param('productId') productId: string) {
+    return this.productsService.getProduct(+productId);
   }
 }
