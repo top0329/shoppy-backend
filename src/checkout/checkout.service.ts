@@ -14,6 +14,9 @@ export class CheckoutService {
   async createSession(productId: number) {
     const product = await this.productService.getProduct(productId);
     return this.stripe.checkout.sessions.create({
+      metadata: {
+        productId,
+      },
       line_items: [
         {
           price_data: {
@@ -34,6 +37,15 @@ export class CheckoutService {
   }
 
   async handleCheckoutWebhooks(event: any) {
-    console.log(event);
+    if (event.type !== 'checkout.session.completed') {
+      return;
+    }
+
+    const session = await this.stripe.checkout.sessions.retrieve(
+      event.data.object.id,
+    );
+    await this.productService.update(parseInt(session.metadata.productId), {
+      sold: true,
+    });
   }
 }
